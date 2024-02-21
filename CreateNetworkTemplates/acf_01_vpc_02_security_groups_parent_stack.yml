@@ -1,0 +1,518 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Parent template to create S3 bucket for storing logs and Reference Architecture to host a 2 or 3 tier Architecture on AWS - Creates New VPC
+
+# Refer the corresponding config file to see the parameterized values
+
+Metadata:
+
+  AWS::CloudFormation::Interface:
+
+    ParameterGroups:
+    - Label:
+        default: Provide the Environment Name and Project Name for the tags. 
+      Parameters:
+      - ProjectName 
+      - Environment 
+      - S3BucketToStoreTemplates
+      
+    - Label:
+        default: Amazon VPC Parameters
+      Parameters:
+      - NumberOfAZs 
+      - AvailabilityZones 
+      - VpcCidr
+      - VpcTenancy
+      - WantVpcFlowLogs 
+      - PublicSubnet0Cidr
+      - PublicSubnet1Cidr
+      - PublicSubnet2Cidr
+      - PublicSubnet3Cidr
+      - PublicSubnet4Cidr
+      - PublicSubnet5Cidr
+      - PrivateSubnet0Cidr
+      - PrivateSubnet1Cidr
+      - PrivateSubnet2Cidr
+      - PrivateSubnet3Cidr
+      - PrivateSubnet4Cidr
+      - PrivateSubnet5Cidr
+      - DataSubnet0Cidr
+      - DataSubnet1Cidr
+      - DataSubnet2Cidr
+      - DataSubnet3Cidr
+      - DataSubnet4Cidr
+      - DataSubnet5Cidr
+      - EMRSubnet0Cidr
+      - EMRSubnet1Cidr
+      - EMRSubnet2Cidr
+      - EMRSubnet3Cidr
+      - EMRSubnet4Cidr
+      - EMRSubnet5Cidr
+      - WantDataBaseTier
+
+    - Label:
+        default: NAT Gateway Confirmation
+      Parameters:
+      - WantNatGatewayForPrivateSubnets
+      - WantNatGatewayForDataBaseSubnets
+      - WantNatGatewayForEMRSubnets
+
+    - Label:
+        default: S3 Log Storage
+      Parameters:
+      - S3BucketForLogs
+    
+    - Label:
+        default: Security Group
+      Parameters:
+      - DmzInetSecurityGroupName
+      - DmzWlSecurityGroupName
+      - DmzBastionSecurityGroupName
+      - App01SecurityGroupName
+      - AppMgmtSecurityGroupName
+      - Data01SecurityGroupName
+      - Data02SecurityGroupName
+      - EksControlPlaneSecurityGroupName
+
+    ParameterLabels:
+      MapId:
+        default: Map Id
+      ProjectName:
+        default: Project Name 
+      Environment:
+        default: Environment Name 
+      S3BucketToStoreTemplates:
+        default: S3 Bucket To Store Templates
+      EksClusterName:
+        default: EKS Cluster Name
+      AvailabilityZones:
+        default: Availability Zones
+      NumberOfAZs:
+        default: Number of Availability Zones
+      VpcCidr:
+        default: VpcCidr
+      VpcTenancy:
+        default: VpcTenancy
+      WantVpcFlowLogs:
+        default: WantVpcFlowLogs
+      PublicSubnet0Cidr:
+        default: Public Subnet 0
+      PublicSubnet1Cidr:
+        default: Public Subnet 1
+      PublicSubnet2Cidr:
+        default: Public Subnet 2
+      PublicSubnet3Cidr:
+        default: Public Subnet 3
+      PublicSubnet4Cidr:
+        default: Public Subnet 4
+      PublicSubnet5Cidr:
+        default: Public Subnet 5
+      PrivateSubnet0Cidr:
+        default: Private Subnet 0
+      PrivateSubnet1Cidr:
+        default: Private Subnet 1
+      PrivateSubnet2Cidr:
+        default: Private Subnet 2
+      PrivateSubnet3Cidr:
+        default: Private Subnet 3
+      PrivateSubnet4Cidr:
+        default: Private Subnet 4
+      PrivateSubnet5Cidr:
+        default: Private Subnet 5
+      DataSubnet0Cidr:
+        default: Data Subnet 0
+      DataSubnet1Cidr:
+        default: Data Subnet 1 
+      DataSubnet2Cidr:
+        default: Data Subnet 2 # Typically, for 3 AZ,s upto 3 Subnets are used. The remaining are kept keeping in mind the probable expansion need. This doesnt cost.
+      DataSubnet3Cidr:
+        default: Data Subnet 3   
+      DataSubnet4Cidr:
+        default: Data Subnet 4
+      DataSubnet5Cidr:
+        default: Data Subnet 5
+      EMRSubnet0Cidr:
+        default: EMR Subnet 0 
+      EMRSubnet1Cidr:
+        default: EMR Subnet 1
+      EMRSubnet2Cidr:
+        default: EMR Subnet 2
+      EMRSubnet3Cidr:
+        default: EMR Subnet 3    
+      EMRSubnet4Cidr:
+        default: EMR Subnet 4
+      EMRSubnet5Cidr:
+        default: EMR Subnet 5
+      WantDataBaseTier:
+        default: Want Database Subnet? Select from Yes or No 
+        
+      # Currently the NAT GW configuration is done in such a way that only one is there for all AZs. In future, if production needs more NAT GWs for higher availability, then it can be changed manually in the console OR changes can be made below.
+      WantNatGatewayForPrivateSubnets: 
+        default: Want NatGateway for Private Subnet? Select from Yes or No   
+      WantNatGatewayForDataBaseSubnets:
+        default: Want NatGateway for Database Subnet? Select from Yes or No   
+      WantNatGatewayForEMRSubnets:
+        default: Want NatGateway for EMR Subnet? Select from Yes or No   
+      S3BucketForLogs:
+        default: S3 Bucket For Logs
+      DmzInetSecurityGroupName:
+        default: Dmz Inet Security Group Name
+      DmzWlSecurityGroupName:
+        default: Dmz Wl Security Group Name
+      DmzBastionSecurityGroupName:
+        default: Dmz Bastion Security Group Name
+      App01SecurityGroupName:
+        default: App 01 Security Group Name
+      AppMgmtSecurityGroupName:
+        default: App Mgmt Security Group Name
+      Data01SecurityGroupName:
+        default: Data 01 Security Group Name
+      Data02SecurityGroupName:
+        default: Data 02 Security Group Name
+      EksControlPlaneSecurityGroupName:
+        default: Eks Control Plane Security Group Name
+
+
+Parameters:
+  ProjectName:
+    Description: Enter the Project name  
+    Type: String
+
+  Environment:
+    Description: Enter the Environment name 
+    Type: String
+    Default: dev
+
+  S3BucketToStoreTemplates:
+    Description: Enter the bucket name where you will store the child templates
+    Type: String
+
+  EksClusterName:
+    Description: Enter the Eks Cluster name
+    Type: String
+    Default: eks-cluster-1
+    
+  WantDataBaseTier: 
+    AllowedValues:
+    - 'no'
+    - 'yes'
+    Default: 'yes'
+    Description: "Want Database or Not? If Yes, Select Yes"
+    Type: String
+  AvailabilityZones:
+    Description: 'List of Availability Zones to use for the subnets in the VPC. Note:
+      The logical order is preserved. Typically even for 1000 customer, three AZs are good enough.
+      For xfactrs, we will keep it as 3'
+    Type: String 
+  NumberOfAZs:
+    AllowedValues:
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    Default: 3 
+    Description: Number of Availability Zones to use in the VPC. This must match your
+      selections in the list of Availability Zones parameter.
+    Type: Number
+  VpcCidr:
+    AllowedPattern:  "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$" 
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+    Type: String
+  VpcTenancy:
+    AllowedValues:
+    - default
+    - dedicated
+    Default: default
+    Description: The allowed tenancy of instances launched into the VPC
+    Type: String
+  DataSubnet0Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.100.0/24
+    Description: CIDR block for data subnet 0 located in Availability Zone 0
+    Type: String
+  DataSubnet1Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.101.0/24
+    Description: CIDR block for data subnet 1 located in Availability Zone 1
+    Type: String
+  DataSubnet2Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.102.0/24
+    Description: CIDR block for data subnet 2 located in Availability Zone 2
+    Type: String
+  DataSubnet3Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.103.0/24
+    Description: CIDR block for data subnet 3 located in Availability Zone 3
+    Type: String
+  DataSubnet4Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.104.0/24
+    Description: CIDR block for data subnet 4 located in Availability Zone 4
+    Type: String
+  DataSubnet5Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.105.0/24
+    Description: CIDR block for data subnet 5 located in Availability Zone 5
+    Type: String
+  PublicSubnet0Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.200.0/24
+    Description: CIDR block for Public subnet 0 located in Availability Zone 0
+    Type: String
+  PublicSubnet1Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.201.0/24
+    Description: CIDR block for Public subnet 1 located in Availability Zone 1
+    Type: String
+  PublicSubnet2Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.202.0/24
+    Description: CIDR block for Public subnet 2 located in Availability Zone 2
+    Type: String
+  PublicSubnet3Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.203.0/24
+    Description: CIDR block for Public subnet 3 located in Availability Zone 3
+    Type: String
+  PublicSubnet4Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.204.0/24
+    Description: CIDR block for Public subnet 4 located in Availability Zone 4
+    Type: String
+  PublicSubnet5Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.205.0/24
+    Description: CIDR block for Public subnet 5 located in Availability Zone 5
+    Type: String
+  PrivateSubnet0Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.0.0/24
+    Description: CIDR block for Private subnet 0 located in Availability Zone 0
+    Type: String
+  PrivateSubnet1Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.4.0/24
+    Description: CIDR block for Private subnet 1 located in Availability Zone 1
+    Type: String
+  PrivateSubnet2Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.8.0/24
+    Description: CIDR block for Private subnet 2 located in Availability Zone 2
+    Type: String
+  PrivateSubnet3Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.12.0/24
+    Description: CIDR block for Private subnet 3 located in Availability Zone 3
+    Type: String
+  PrivateSubnet4Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.16.0/24
+    Description: CIDR block for Private subnet 4 located in Availability Zone 4
+    Type: String
+  PrivateSubnet5Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.20.0/24
+    Description: CIDR block for Private subnet 5 located in Availability Zone 5
+    Type: String
+  EMRSubnet0Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.24.0/24
+    Description: CIDR block for EMR subnet 0 located in Availability Zone 0
+    Type: String
+  EMRSubnet1Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.28.0/24
+    Description: CIDR block for EMR subnet 1 located in Availability Zone 1
+    Type: String
+  EMRSubnet2Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.32.0/24
+    Description: CIDR block for EMR subnet 2 located in Availability Zone 2
+    Type: String
+  EMRSubnet3Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.36.0/24
+    Description: CIDR block for EMR subnet 3 located in Availability Zone 3
+    Type: String
+  EMRSubnet4Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.40.0/24
+    Description: CIDR block for EMR subnet 4 located in Availability Zone 4
+    Type: String
+  EMRSubnet5Cidr:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.44.0/24
+    Description: CIDR block for EMR subnet 5 located in Availability Zone 5
+    Type: String
+
+  WantNatGatewayForPrivateSubnets:
+    AllowedValues:
+    - 'no'
+    - 'yes'
+    Default: 'yes'
+    Description: "Want NatGateway for Private Subnet or Not? If Yes, Select Yes" # TBD?
+    Type: String
+
+  WantNatGatewayForDataBaseSubnets:
+    AllowedValues:
+    - 'no'
+    - 'yes'
+    Default: 'yes'
+    Description: "Want NatGateway for Database Subnet or Not? If Yes, Select Yes"
+    Type: String
+
+  WantNatGatewayForEMRSubnets:
+    AllowedValues:
+    - 'no'
+    - 'yes'
+    Default: 'yes'
+    Description: "Want NatGateway for EMR Subnet or Not? If Yes, Select Yes"
+    Type: String
+
+  WantVpcFlowLogs:
+   AllowedValues:
+   - 'enable'
+   - 'disable'
+   Default: 'enable'
+   Description: "Want VpcFlowlogs or Not? If Yes, Select enable" # TBD? Where will this be stored
+   Type: String
+
+  MapId:
+    Description: Map id
+    Type: String
+    Default: mig60RPANO80S
+    
+  S3BucketForLogs:
+    Description: "Enter the S3 Bucket name."
+    Type: String
+
+  DmzInetSecurityGroupName:
+    Type: String
+    Description: Name of DMZ Internet Security Group.
+    Default: dmz-inet-sec-zone-1  
+
+  DmzWlSecurityGroupName:
+    Type: String
+    Description: Name of DMZ Whitelisted Security Group.
+    Default: dmz-wl-sec-zone-1       
+
+  DmzBastionSecurityGroupName:
+    Type: String
+    Description: Name of DMZ Bastion Security Group.
+    Default: dmz-bastion-sec-zone-1  
+
+  App01SecurityGroupName:
+    Type: String
+    Description: Name of Application Security Group.
+    Default: app-sec-zone-1 
+
+  AppMgmtSecurityGroupName:
+    Type: String
+    Description: Name of Application Security Group.
+    Default: app-mgmt-zone-1    
+
+  Data01SecurityGroupName:
+    Type: String
+    Description: Name of RDS Security Group.
+    Default: data-rds-sec-zone-1
+    
+  Data02SecurityGroupName:
+    Type: String
+    Description: Name of EMR Security Group. xfacts will use the same for master, core and task nodes
+    Default: data-emr-sec-zone-1  
+
+  EksControlPlaneSecurityGroupName:
+    Type: String
+    Description: Name of EKS Cluster Security Group
+    Default: eks-cluster-1
+  
+
+Resources:
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join ['', ['https://', !Ref S3BucketToStoreTemplates, '.s3.amazonaws.com/', 'acf_01_vpc.yml']]
+      Parameters:
+        MapId: !Ref MapId
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        EksClusterName: !Ref EksClusterName
+        AvailabilityZones: !Ref AvailabilityZones
+        NumberOfAZs: !Ref NumberOfAZs
+        VpcCidr: !Ref VpcCidr
+        VpcTenancy: !Ref VpcTenancy
+        WantVpcFlowLogs: !Ref WantVpcFlowLogs
+        PublicSubnet0Cidr: !Ref PublicSubnet0Cidr
+        PublicSubnet1Cidr: !Ref PublicSubnet1Cidr
+        PublicSubnet2Cidr: !Ref PublicSubnet2Cidr
+        PublicSubnet3Cidr: !Ref PublicSubnet3Cidr
+        PublicSubnet4Cidr: !Ref PublicSubnet4Cidr
+        PublicSubnet5Cidr: !Ref PublicSubnet5Cidr
+        PrivateSubnet0Cidr: !Ref PrivateSubnet0Cidr
+        PrivateSubnet1Cidr: !Ref PrivateSubnet1Cidr
+        PrivateSubnet2Cidr: !Ref PrivateSubnet2Cidr
+        PrivateSubnet3Cidr: !Ref PrivateSubnet3Cidr
+        PrivateSubnet4Cidr: !Ref PrivateSubnet4Cidr
+        PrivateSubnet5Cidr: !Ref PrivateSubnet5Cidr
+        DataSubnet0Cidr: !Ref DataSubnet0Cidr
+        DataSubnet1Cidr: !Ref DataSubnet1Cidr
+        DataSubnet2Cidr: !Ref DataSubnet2Cidr
+        DataSubnet3Cidr: !Ref DataSubnet3Cidr
+        DataSubnet4Cidr: !Ref DataSubnet4Cidr
+        DataSubnet5Cidr: !Ref DataSubnet5Cidr
+        EMRSubnet0Cidr: !Ref EMRSubnet0Cidr
+        EMRSubnet1Cidr: !Ref EMRSubnet1Cidr
+        EMRSubnet2Cidr: !Ref EMRSubnet2Cidr
+        EMRSubnet3Cidr: !Ref EMRSubnet3Cidr
+        EMRSubnet4Cidr: !Ref EMRSubnet4Cidr
+        EMRSubnet5Cidr: !Ref EMRSubnet5Cidr
+        WantDataBaseTier: !Ref WantDataBaseTier
+        WantNatGatewayForPrivateSubnets: !Ref WantNatGatewayForPrivateSubnets
+        WantNatGatewayForDataBaseSubnets: !Ref WantNatGatewayForDataBaseSubnets
+        WantNatGatewayForEMRSubnets: !Ref WantNatGatewayForEMRSubnets 
+        S3BucketForLogs: !Ref S3BucketForLogs
+
+  SecurityGroups:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: VPCStack
+    Properties:
+      TemplateURL: !Join ['', ['https://', !Ref S3BucketToStoreTemplates, '.s3.amazonaws.com/', 'acf_02_security_groups.yml']]
+      Parameters:
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        DmzInetSecurityGroupName: !Ref DmzInetSecurityGroupName
+        DmzWlSecurityGroupName: !Ref DmzWlSecurityGroupName
+        DmzBastionSecurityGroupName: !Ref DmzBastionSecurityGroupName
+        App01SecurityGroupName: !Ref App01SecurityGroupName
+        AppMgmtSecurityGroupName: !Ref AppMgmtSecurityGroupName
+        Data01SecurityGroupName: !Ref Data01SecurityGroupName
+        Data02SecurityGroupName: !Ref Data02SecurityGroupName
+        EksControlPlaneSecurityGroupName: !Ref EksControlPlaneSecurityGroupName

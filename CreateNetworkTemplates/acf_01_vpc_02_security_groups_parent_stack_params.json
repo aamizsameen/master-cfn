@@ -1,0 +1,190 @@
+[
+    {
+      "ParameterKey": "ProjectName",
+      "ParameterValue": "axcess-test"
+    },
+    {
+      "ParameterKey": "Environment",
+      "ParameterValue": "prod"
+    }, 
+    {
+      "ParameterKey": "EksClusterName",
+      "ParameterValue": "eks-cluster-1"
+    },    
+    {
+      "ParameterKey": "MapId",
+      "ParameterValue": "mig60RPANO80S"      
+    },
+    {
+      "ParameterKey": "WantDataBaseTier",
+      "ParameterValue": "yes"
+    },
+    {
+      "ParameterKey": "AvailabilityZones",
+      "ParameterValue": "ap-south-1a,ap-south-1b,ap-south-1c"
+    },
+    {
+      "ParameterKey": "NumberOfAZs",
+      "ParameterValue": "3"        
+    },
+    {
+      "ParameterKey": "VpcCidr",
+      "ParameterValue": "172.22.0.0/18"
+    },
+    {
+      "ParameterKey": "VpcTenancy",
+      "ParameterValue": "default"
+    },
+    {
+      "ParameterKey": "DataSubnet0Cidr",
+      "ParameterValue": "172.22.48.0/23"
+    },
+    {
+      "ParameterKey": "DataSubnet1Cidr",
+      "ParameterValue": "172.22.50.0/23"
+    },
+    {
+      "ParameterKey": "DataSubnet2Cidr",
+      "ParameterValue": "172.22.52.0/23"
+    },
+    {
+      "ParameterKey": "DataSubnet3Cidr",
+      "ParameterValue": "172.22.54.0/23"
+    },
+    {
+      "ParameterKey": "DataSubnet4Cidr",
+      "ParameterValue": "172.22.56.0/23"
+    },
+    {
+      "ParameterKey": "DataSubnet5Cidr",
+      "ParameterValue": "172.22.58.0/23"
+    },
+    {
+      "ParameterKey": "PublicSubnet0Cidr",
+      "ParameterValue": "172.22.0.0/23"
+    },
+    {
+      "ParameterKey": "PublicSubnet1Cidr",
+      "ParameterValue": "172.22.2.0/23"
+    },
+    {
+      "ParameterKey": "PublicSubnet2Cidr",
+      "ParameterValue": "172.22.4.0/23"
+    },
+    {
+      "ParameterKey": "PublicSubnet3Cidr",
+      "ParameterValue": "172.22.6.0/23"
+    },
+    {
+      "ParameterKey": "PublicSubnet4Cidr",
+      "ParameterValue": "172.22.8.0/23"
+    },
+    {
+      "ParameterKey": "PublicSubnet5Cidr",
+      "ParameterValue": "172.22.10.0/23"
+    },
+    {
+      "ParameterKey": "PrivateSubnet0Cidr",
+      "ParameterValue": "172.22.12.0/22"
+    },
+    {
+      "ParameterKey": "PrivateSubnet1Cidr",
+      "ParameterValue": "172.22.16.0/22"
+    },
+    {
+      "ParameterKey": "PrivateSubnet2Cidr",
+      "ParameterValue": "172.22.20.0/22"
+    },
+    {
+      "ParameterKey": "PrivateSubnet3Cidr",
+      "ParameterValue": "172.22.24.0/22"
+    },
+    {
+      "ParameterKey": "PrivateSubnet4Cidr",
+      "ParameterValue": "172.22.28.0/22"
+    },
+    {
+      "ParameterKey": "PrivateSubnet5Cidr",
+      "ParameterValue": "172.22.32.0/22"
+    },
+    {
+      "ParameterKey": "EMRSubnet0Cidr",
+      "ParameterValue": "172.22.36.0/23"
+    },
+    {
+      "ParameterKey": "EMRSubnet1Cidr",
+      "ParameterValue": "172.22.38.0/23"
+    },
+    {
+      "ParameterKey": "EMRSubnet2Cidr",
+      "ParameterValue": "172.22.40.0/23"
+    },
+    {
+      "ParameterKey": "EMRSubnet3Cidr",
+      "ParameterValue": "172.22.42.0/23"
+    },
+    {
+      "ParameterKey": "EMRSubnet4Cidr",
+      "ParameterValue": "172.22.44.0/23"
+    },
+    {
+      "ParameterKey": "EMRSubnet5Cidr",
+      "ParameterValue": "172.22.46.0/23"
+    },
+    {
+      "ParameterKey": "WantNatGatewayForPrivateSubnets",
+      "ParameterValue": "yes"
+    },
+    {
+      "ParameterKey": "WantNatGatewayForDataBaseSubnets",
+      "ParameterValue": "no"
+    },
+    {
+      "ParameterKey": "WantNatGatewayForEMRSubnets",
+      "ParameterValue": "yes"
+    },
+    {
+      "ParameterKey": "WantVpcFlowLogs",
+      "ParameterValue": "enable"
+    },
+    {
+      "ParameterKey": "S3BucketForLogs",
+      "ParameterValue": "bnm-testing"
+    },
+    {
+      "ParameterKey": "S3BucketToStoreTemplates",
+      "ParameterValue": "bnm-testing"
+    },
+    {
+        "ParameterKey": "DmzInetSecurityGroupName",
+        "ParameterValue": "dmz-inet-sec-zone-1"
+    },
+    {
+        "ParameterKey": "DmzWlSecurityGroupName",
+        "ParameterValue": "dmz-wl-sec-zone-1"
+    },
+    {
+        "ParameterKey": "DmzBastionSecurityGroupName",
+        "ParameterValue": "dmz-bastion-sec-zone-1"
+    },
+    {
+        "ParameterKey": "App01SecurityGroupName",
+        "ParameterValue": "app-sec-zone-1"
+    },
+    {
+        "ParameterKey": "AppMgmtSecurityGroupName",
+        "ParameterValue": "app-mgmt-zone-1"
+    },
+    {
+        "ParameterKey": "Data01SecurityGroupName",
+        "ParameterValue": "data-rds-sec-zone-1"
+    },
+    {
+        "ParameterKey": "Data02SecurityGroupName",
+        "ParameterValue": "data-emr-sec-zone-1"
+    },
+    {
+        "ParameterKey": "EksControlPlaneSecurityGroupName",
+        "ParameterValue": "eks-cluster-1"
+    }
+]    

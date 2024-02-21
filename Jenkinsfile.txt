@@ -31,7 +31,7 @@ pipeline {
         //     }
         // }
         stage ('Deploy DB Stack in dev account')
-         {
+        {
             // when { 
             //     expression { params.BRANCH == 'dev' }
             // }
@@ -50,7 +50,7 @@ pipeline {
         }
 
         stage ('Deploy Network Stack in dev account')
-         {
+        {
             // when { 
             //     expression { params.BRANCH == 'dev' }
             // }
@@ -61,13 +61,32 @@ pipeline {
                         echo "Which Environment"
                         echo "${DEPLOY_ENV}"
                         echo "Executing in $DEPLOY_ENV environment"
-                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network --template-body file://CreateNetworkTemplates/main.yaml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network    --template-body file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack.yml --parameters file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack_params.yml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
                         sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network --region ${REGION}"
                  //   }
                 }
             }
         }
 
+
+        // stage ('Deploy Network Stack in dev account')
+        // {
+        //     // when { 
+        //     //     expression { params.BRANCH == 'dev' }
+        //     // }
+        //     steps {
+        //         // For cross account use the below.
+        //         //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
+        //             script {
+        //                 echo "Which Environment"
+        //                 echo "${DEPLOY_ENV}"
+        //                 echo "Executing in $DEPLOY_ENV environment"
+        //                 sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network    --template-body file://CreateNetworkTemplates/main.yaml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+        //                 sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network --region ${REGION}"
+        //          //   }
+        //         }
+        //     }
+        // }
 
 
         // stage ('Execute deployment in prod account') {
