@@ -13,7 +13,7 @@
     },
     {
         "ParameterKey": "DBAllocatedStorage",
-        "ParameterValue": "21"
+        "ParameterValue": "20"
     },
     {
         "ParameterKey": "DBMaxAllocatedStorage",
@@ -81,27 +81,27 @@
     },
     {
         "ParameterKey": "VpcId",
-        "ParameterValue": "vpc-00bb2faef765c3ca7"
+        "ParameterValue": "vpc-0c85ae3846f4c46db"
     },
     {
         "ParameterKey": "PublicSubnet1",
-        "ParameterValue": "subnet-09b0aab36cce94cfc"
+        "ParameterValue": "subnet-0bf634d3b2194d514"
     },
     {
         "ParameterKey": "PublicSubnet2",
-        "ParameterValue": "subnet-03ca0fd3c44efc6dc"
+        "ParameterValue": "subnet-06b31a44a00a733ca"
     },
     {
         "ParameterKey": "PrivateSubnet1",
-        "ParameterValue": "subnet-0971961c507439b40"
+        "ParameterValue": "subnet-0e464d627de536016"
     },
     {
         "ParameterKey": "PrivateSubnet2",
-        "ParameterValue": "subnet-065e2a951d7ce5909"
+        "ParameterValue": "subnet-0ec2b1e9eafaf1600"
     },
     {
         "ParameterKey": "CustomDBSecurityGroup",
-        "ParameterValue": "sg-074f7e1d8c775d035"
+        "ParameterValue": "sg-01adba44ea5bfc162"
     },
     {
         "ParameterKey": "Application",
