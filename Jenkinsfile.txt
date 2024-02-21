@@ -30,24 +30,25 @@ pipeline {
         //         sh 'git pull'
         //     }
         // }
-        stage ('Deploy DB Stack in dev account')
-        {
-            // when { 
-            //     expression { params.BRANCH == 'dev' }
-            // }
-            steps {
-                // For cross account use the below.
-                //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
-                    script {
-                        echo "Which Environment"
-                        echo "${DEPLOY_ENV}"
-                        echo "Executing in $DEPLOY_ENV environment"
-                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yaml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-                        sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database --region ${REGION}"
-                 //   }
-                }
-            }
-        }
+        
+        // stage ('Deploy DB Stack in dev account')
+        // {
+        //     // when { 
+        //     //     expression { params.BRANCH == 'dev' }
+        //     // }
+        //     steps {
+        //         // For cross account use the below.
+        //         //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
+        //             script {
+        //                 echo "Which Environment"
+        //                 echo "${DEPLOY_ENV}"
+        //                 echo "Executing in $DEPLOY_ENV environment"
+        //                 sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yaml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+        //                 sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database --region ${REGION}"
+        //          //   }
+        //         }
+        //     }
+        // }
 
         stage ('Deploy Network Stack in dev account')
         {
