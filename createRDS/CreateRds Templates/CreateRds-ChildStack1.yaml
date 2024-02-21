@@ -1,0 +1,462 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "AWS RDS for Postgresql, mysql and mariadb"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Provide the Environment Name and Project Name for the tags.
+        Parameters:
+          - ProjectName
+          - Environment
+      - Label:
+          default: Network configuration
+        Parameters:
+          - PubliclyAccessible
+          - PublicSubnet1
+          - PublicSubnet2
+          - PrivateSubnet1
+          - PrivateSubnet2
+          - CustomDBSecurityGroup
+      - Label:
+          default: Database configuration
+        Parameters:
+          - DBEngineMode
+          - DBInstanceIdentifier
+          - DBName
+          - DBMasterUsername
+          - DBPasswordCreationAndRotationFromSecretsManager
+          - DBMasterUserPassword
+          - DBPort
+          - DBAutoMinorVersionUpgrade
+          - DBAutoMajorVersionUpgrade
+          - DBBackupRetentionPeriod
+          - DBEngineVersion
+          - DBMultiAZ
+          - DBInstanceClass
+          - DBStorageType
+          - Iops
+          - DBAllocatedStorage
+          - DBMaxAllocatedStorage
+          - LicenseModel
+          - DBDeletionProtection
+          - DBDeleteAutomatedBackups
+          - DBCloudwatchLogExports
+          - CopyTagsToSnapshot
+      - Label:
+          default: Database Tags 
+        Parameters:
+          - Application
+          - ApplicationVersion
+          - ProjectCostCenter
+          - Confidentiality
+          - Compliance
+      - Label:
+          default: Additional Configurations (Optional)
+        Parameters:
+          - DBStorageEncrypted
+          - EnablePerformanceInsights
+          - PerformanceInsightsRetentionPeriod
+    ParameterLabels:
+      ProjectName:
+        default: Project Name
+      Environment:
+        default: Environment Name
+      DBInstanceIdentifier:
+        default: DBInstanceIdentifier
+      DBName:
+        default: DBName
+      DBEngineVersion:
+        default: Database Engine Version
+      DBEngineMode:
+        default: Database Engine Mode
+      DBAllocatedStorage:
+        default: Database allocated storage
+      DBMaxAllocatedStorage:
+        default: Database maximum allocated storage
+      DBCloudwatchLogExports:
+        default: Database CloudWatch Log Exports
+      DBAutoMinorVersionUpgrade:
+        default: Database auto minor version upgrade
+      DBAutoMajorVersionUpgrade:
+        default: Database auto major version upgrade
+      DBBackupRetentionPeriod:
+        default: Database backup retention period
+      DBInstanceClass:
+        default: Database instance class
+      DBMasterUsername:
+        default: Database master username
+      DBMasterUserPassword:
+        default: Database master password
+      DBPort:
+        default: Database port
+      DBMultiAZ:
+        default: Multi-AZ deployment
+      CopyTagsToSnapshot:
+        default: Copy Tag to Snapshot
+      PubliclyAccessible:
+        default: Publicly Accessiable
+      PublicSubnet1:
+        default: Public Subnet 1
+      PublicSubnet2:
+        default: Public Subnet 2
+      PrivateSubnet1:
+        default: Private Subnet 1
+      PrivateSubnet2:
+        default: Private Subnet 2
+      DBDeletionProtection:
+        default: A value that indicates whether the DB instance has deletion protection enabled.
+      DBDeleteAutomatedBackups:
+        default: A value that indicates whether to remove automated backups immediately after the DB instance is deleted. 
+      CustomDBSecurityGroup:
+        default: Custom security group ID
+      Application:
+        default: Application name
+      ApplicationVersion:
+        default: Application version
+      Compliance:
+        default: Compliance classifier
+      Confidentiality:
+        default: Confidentiality classifier
+      ProjectCostCenter:
+        default: Project cost center
+      LicenseModel:
+        default: License model
+      DBPasswordCreationAndRotationFromSecretsManager:
+        default: A value that indicates whether database password is to created and rotated using secrets manager.
+      DBStorageType:
+        default: Database storage type
+      Iops:
+        default: Iops value
+      DBStorageEncrypted:
+        default: A value that indicates whether the DB instance is encrypted.
+      EnablePerformanceInsights:
+        default: A value that indicates whether performace insights are enabled
+      PerformanceInsightsRetentionPeriod:
+        default: A value that indicates the perforamance insights retention period
+Parameters:
+  ProjectName:
+    Description: Enter the Project name
+    Type: String
+  Environment:
+    Description: Enter the Environment name
+    Type: String
+    Default: Dev
+  DBMultiAZ:
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "true"
+    Description: "Specifies if the database instance is a multiple Availability Zone deployment"
+    Type: String
+  DBAllocatedStorage:
+    Default: "20"
+    Description: "The amount of storage in gibibytes (GiB) to allocate to each DB instance in the Multi-AZ DB cluster. If any value is set in the Iops parameter, AllocatedStorage must be at least 100 GiB (Applicable to Multi-AZ DB clusters only)
+        - gp2 - ranges between 20 to 65536
+        - io1 - ranges between 100 to 65536
+        - standard - ranges between 5 to 3072"
+    Type: String
+  DBMaxAllocatedStorage:
+    Type: Number
+    Default: 40
+    Description: "The upper limit in gibibytes (GiB) to which Amazon RDS can automatically scale the storage of the DB instance."
+  DBCloudwatchLogExports:
+    Default: 'general'
+    Description: "Choose from the list of log types that need to be enabled for exporting to CloudWatch Logs. Enter the values like an array of string (comma separated values). For ex. general,audit,error
+      - MariaDB Valid values - audit, error, general, slowquery
+      - MySQL Valid values - audit, error, general, slowquery
+      - PostgreSQL Valid values - postgresql, upgrade"
+    Type: CommaDelimitedList
+  DBPasswordCreationAndRotationFromSecretsManager:
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: "Do you want the databse password to be created and rotated on a schedule (every 89 days) by the secrets manager"
+    Type: String
+  DBAutoMinorVersionUpgrade:
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+    Description: "Select true to enable automatic minor version upgrade."
+    Type: String
+  DBAutoMajorVersionUpgrade:
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "false"
+    Description: "Select true to enable automatic major version upgrade."
+    Type: String
+  DBBackupRetentionPeriod:
+    Default: 35
+    Description: "The number of days for which automatic database snapshots are retained from 1 to 35 days."
+    Type: Number
+    MinValue: 1
+    MaxValue: 35
+  DBEngineMode:
+    Default: mysql
+    Description: "Select a RDS Engine Type."
+    Type: String
+    AllowedValues:
+    - mariadb
+    - mysql
+    - postgres
+  DBEngineVersion:
+    Description: "Enter Database Engine Version"
+    ConstraintDescription: "Must enter a valid database engine version"
+    Type: String
+    Default: '5.7.37'
+  DBInstanceClass:
+    ConstraintDescription: "Must enter a valid database instance type."
+    Default: db.t2.micro
+    Description: "Enter the name of the compute and memory capacity class of the database instance. "
+    Type: String
+  DBMasterUserPassword:
+    AllowedPattern: ^(?=^.{8,255}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[@/"']).*$
+    ConstraintDescription: Min 8 chars. Must include 1 uppercase, 1 lowercase, 1 number, 1 (non  / @ " ' ) symbol
+    Description: The database admin account password. Must include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ " ') symbol.
+      - MariaDB Constraints - Must contain from 8 to 41 characters.
+      - MySQL Constraints - Must contain from 8 to 41 characters.
+      - PostgreSQL Constraints - Must contain from 8 to 128 characters.
+    MaxLength: "128"
+    MinLength: "8"
+    NoEcho: "True"
+    Type: String
+  DBMasterUsername:
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription: "Must begin with a letter and contain only alphanumeric characters."
+    Default: msadmin
+    Description: "The database admin account username.
+      - MariaDB Constraints - Must be 1 to 16 letters or numbers. Can't be a reserved word for the chosen database engine.
+      - MySQL Constraints - Must be 1 to 16 letters or numbers. First character must be a letter. Can't be a reserved word for the chosen database engine.
+      - PostgreSQL Constraints - Must be 1 to 63 letters or numbers. First character must be a letter. Can't be a reserved word for the chosen database engine."
+    MaxLength: "63"
+    MinLength: "1"
+    Type: String
+  DBPort:
+    Default: "3306"
+    Description: "The port on which the DB instance will listen for connections.
+      - MariaDB Port - 3306
+      - MySQL Port - 3306
+      - PostgreSQL Port - 5432"
+    Type: String
+  DBInstanceIdentifier:
+    Default: 'demo'
+    Description: "A name for the DB instance."
+    MaxLength: "63"
+    MinLength: "1"
+    Type: String
+  DBName:
+    Default: 'NewDB'
+    Description: "The name of the database to create when the DB instance is created. If this parameter is not specified, no database is created in the DB instance. For postgres, the default postgres database is created in the DB instance. Can't be a word reserved by the specified database engine"
+    MaxLength: "64"
+    MinLength: "1"
+    Type: String
+  PublicSubnet1:
+    Description: "Select the PublicSubnet1. Both the public subnets should in different Availability Zone"
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet2:
+    Description: "Select the PublicSubnet2. Both the public subnets should in different Availability Zone"
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet1:
+    Description: "Select the PrivateSubnet1. Both the private subnets should in different Availability Zone"
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2:
+    Description: "Select the PrivateSubnet2. Both the private subnets should in different Availability Zone"
+    Type: AWS::EC2::Subnet::Id 
+  CustomDBSecurityGroup:
+    Description: "Select the security group for database"
+    Type: AWS::EC2::SecurityGroup::Id
+  Application:
+    Type: String
+    Default: ''
+    Description: "Designates the application of the associated AWS resource. (Optional)"
+  ApplicationVersion:
+    Type: String
+    Description: "Designates the specific version of the application. (Optional)"
+    Default: ''
+  ProjectCostCenter:
+    Type: String
+    Default: ''
+    Description: "Designates the cost center associated with the project of the given AWS resource. (Optional)"
+  Confidentiality:
+    Type: String
+    Default: ''
+    Description: "Designates the confidentiality classification of the data that is associated with the resource. (Optional)"
+    AllowedValues:
+      - public
+      - private
+      - confidential
+      - pii/phi
+      - ''
+  Compliance:
+    Type: String
+    Default: ''
+    Description: "Designates the compliance level for the AWS resource. (Optional)"
+    AllowedValues:
+      - hipaa
+      - sox
+      - fips
+      - other
+      - ''
+  CopyTagsToSnapshot:
+    Default: 'false'
+    Description: "If you specify true, this will copy tags from the DB instance to snapshots of the DB instance."
+    Type: String
+    AllowedValues: 
+    - true
+    - false
+  LicenseModel:
+    Default: general-public-license
+    Description: 
+      "MariaDB - general-public-license, MySQL - general-public-license, PostgreSQL - postgresql-license"
+    Type: String
+    AllowedValues:
+    - general-public-license
+    - postgresql-license
+  PubliclyAccessible:
+    Default: 'false'
+    Description: "If you specify true, AWS CloudFormation creates an instance with a publicly resolvable DNS name,  which resolves to a public IP address."
+    Type: String
+    AllowedValues: 
+    - true
+    - false
+  EnablePerformanceInsights:
+    Default: 'false'
+    Description: "If you specify true, this will enable Performance Insights for the DB instance"
+    Type: String
+    AllowedValues: 
+    - true
+    - false
+  PerformanceInsightsRetentionPeriod:
+    Type: Number
+    Default: 7
+    Description: "The number of days to retain Performance Insights data.(Allowed values - 7,month * 31, 731). If you specify a retention period that isn't valid, such as 94, Amazon RDS returns an error."
+  DBDeletionProtection:
+    Default: 'true'
+    Description: "The database can't be deleted when deletion Protection is enabled. Select true to enable deletion protection."
+    Type: String
+    AllowedValues: 
+    - true
+    - false
+  DBDeleteAutomatedBackups:
+    Default: 'true'
+    Description: "A value that indicates whether to remove automated backups immediately after the DB instance is deleted."
+    Type: String
+    AllowedValues: 
+    - true
+    - false
+  DBStorageType:
+    Default: 'gp2' 
+    Description: "Select a Storage type. (gp2 baseline performance determined by vol size, gp3 performance scales independently from storage and io1 provides flexibility in provisioning I/O). If you specify gp3 or io1, you must also include a value for the Iops parameter."
+    Type: String
+    AllowedValues:
+    - gp2
+    - gp3
+    - io1
+    - standard
+  DBStorageEncrypted:
+    Default: 'true'
+    Description: "A value that indicates whether the DB instance is encrypted. By default, it isn't encrypted."
+    Type: String
+    AllowedValues:
+    - true
+    - false
+  Iops:
+    Default: '1000'
+    Description: "The number of I/O operations per second (IOPS) that the database provisions(Applicable when DBStorageType is gp3 or io1). The minimum value is 1,000 IOPS and the maximum value is 2,56,000 IOPS. The IOPS to GiB ratio must be between 0.5 and 50"
+    ConstraintDescription: "The minimum value is 1,000 IOPS and the maximum value is 2,56,000 IOPS. The IOPS to GiB ratio must be between 0.5 and 50"
+    Type: String
+
+Conditions:
+  AccessRds: !Equals [ !Ref PubliclyAccessible, 'true' ]
+  DBPasswordRotation: !Equals [ !Ref DBPasswordCreationAndRotationFromSecretsManager, 'true' ]
+  PerformanceInsights: !Equals [ !Ref EnablePerformanceInsights, 'true' ]
+  StorageType: !Equals [!Ref DBStorageType, 'io1']
+
+Resources:
+  PrivateDbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "Private Subnets for RDS"
+      SubnetIds:
+      - Ref: PrivateSubnet1
+      - Ref: PrivateSubnet2
+      Tags:
+      - Key: Name
+        Value: !Join [ '-', [  !Ref 'ProjectName', !Ref 'Environment', 'PrivateDbSubnetGroup' ] ]
+  PublicDbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "Public Subnets for RDS"
+      SubnetIds:
+      - Ref: PublicSubnet1
+      - Ref: PublicSubnet2
+      Tags:
+      - Key: Name
+        Value: !Join [ '-', [  !Ref 'ProjectName', !Ref 'Environment', 'PublicDbSubnetGroup' ] ]
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: !Ref DBAllocatedStorage
+      AllowMajorVersionUpgrade: !Ref DBAutoMajorVersionUpgrade
+      AutoMinorVersionUpgrade: !Ref DBAutoMinorVersionUpgrade
+      BackupRetentionPeriod: !Ref DBBackupRetentionPeriod
+      CopyTagsToSnapshot: !Ref CopyTagsToSnapshot
+      DBInstanceClass: !Ref DBInstanceClass
+      DBInstanceIdentifier: !Join [ '-', [  !Ref 'ProjectName', !Ref 'Environment', !Ref 'DBInstanceIdentifier' ] ]
+      DBName: !Ref DBName
+      DBSubnetGroupName: !If [AccessRds, !Ref PublicDbSubnetGroup, !Ref PrivateDbSubnetGroup]
+      DeleteAutomatedBackups: !Ref DBDeleteAutomatedBackups
+      DeletionProtection: !Ref DBDeletionProtection
+      EnableCloudwatchLogsExports: !Ref DBCloudwatchLogExports
+      EnablePerformanceInsights: !Ref EnablePerformanceInsights
+      Engine: !Ref DBEngineMode
+      EngineVersion: !Ref DBEngineVersion
+      PerformanceInsightsRetentionPeriod: !If [PerformanceInsights, !Ref PerformanceInsightsRetentionPeriod, !Ref 'AWS::NoValue']
+      LicenseModel: !Ref LicenseModel
+      MasterUsername: !Ref DBMasterUsername
+      MasterUserPassword: !Ref DBMasterUserPassword
+      MaxAllocatedStorage: !Ref DBMaxAllocatedStorage 
+      MultiAZ: !Ref DBMultiAZ
+      Port: !Ref DBPort
+      PubliclyAccessible: !Ref PubliclyAccessible
+      StorageEncrypted: !Ref DBStorageEncrypted
+      StorageType: !Ref DBStorageType
+      Iops: !If [ StorageType, !Ref Iops, !Ref 'AWS::NoValue' ]
+      VPCSecurityGroups: 
+        - !Ref CustomDBSecurityGroup
+      Tags:
+        -
+          Key: DBName
+          Value: !Ref DBName
+        - 
+          Key: DBInstanceIdentifier
+          Value: !Join [ '-', [  !Ref 'ProjectName', !Ref 'Environment', !Ref 'DBInstanceIdentifier' ] ]
+        -
+          Key: Application
+          Value: !Ref Application
+        -
+          Key: ApplicationVersion
+          Value: !Ref ApplicationVersion
+        -
+          Key: ProjectCostCenter
+          Value: !Ref ProjectCostCenter
+        -
+          Key: Confidentiality
+          Value: !Ref Confidentiality
+        -
+          Key: Compliance
+          Value: !Ref Compliance
+  
+
+Outputs:
+  DBInstanceIdentifier:
+    Description: "Database instance name"
+    Value: !Ref DBInstance
+  DBInstanceEndpoint:
+    Description: "The connection endpoint for the database."
+    Value: !Sub ${DBInstance.Endpoint.Address}
+  DBInstancePort:
+    Description: "The port number on which the database accepts connections"
+    Value: !Sub ${DBInstance.Endpoint.Port}

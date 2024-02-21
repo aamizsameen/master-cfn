@@ -1,0 +1,166 @@
+[
+    {
+        "ParameterKey": "ProjectName",
+        "ParameterValue": "VikasMySQLV3"
+    },
+    {
+        "ParameterKey": "Environment",
+        "ParameterValue": "Dev"
+    },
+    {
+        "ParameterKey": "DBMultiAZ",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "DBAllocatedStorage",
+        "ParameterValue": "21"
+    },
+    {
+        "ParameterKey": "DBMaxAllocatedStorage",
+        "ParameterValue": "200"
+    },
+    {
+        "ParameterKey": "DBCloudwatchLogExports",
+        "ParameterValue": "general"
+    },
+    {
+        "ParameterKey": "DBPasswordCreationAndRotationFromSecretsManager",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "RotateImmediatelyOnUpdate",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "PasswordRotationFrequencyInDays",
+        "ParameterValue": "7"
+    },
+    {
+        "ParameterKey": "DBAutoMinorVersionUpgrade",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "DBAutoMajorVersionUpgrade",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "DBBackupRetentionPeriod",
+        "ParameterValue": "35"
+    },
+    {
+        "ParameterKey": "DBEngineMode",
+        "ParameterValue": "mysql"
+    },
+    {
+        "ParameterKey": "DBEngineVersion",
+        "ParameterValue": "5.7.37"
+    },
+    {
+        "ParameterKey": "DBInstanceClass",
+        "ParameterValue": "db.t2.micro"
+    },
+    {
+        "ParameterKey": "DBMasterUserPassword",
+        "ParameterValue": "VikasAdmin123$"
+    },
+    {
+        "ParameterKey": "DBMasterUsername",
+        "ParameterValue": "msadmin"
+    },
+    {
+        "ParameterKey": "DBPort",
+        "ParameterValue": "3306"
+    },
+    {
+        "ParameterKey": "DBInstanceIdentifier",
+        "ParameterValue": "mysql-on-v3-private"
+    },
+    {
+        "ParameterKey": "DBName",
+        "ParameterValue": "NewDB"
+    },
+    {
+        "ParameterKey": "VpcId",
+        "ParameterValue": "vpc-00bb2faef765c3ca7"
+    },
+    {
+        "ParameterKey": "PublicSubnet1",
+        "ParameterValue": "subnet-09b0aab36cce94cfc"
+    },
+    {
+        "ParameterKey": "PublicSubnet2",
+        "ParameterValue": "subnet-03ca0fd3c44efc6dc"
+    },
+    {
+        "ParameterKey": "PrivateSubnet1",
+        "ParameterValue": "subnet-0971961c507439b40"
+    },
+    {
+        "ParameterKey": "PrivateSubnet2",
+        "ParameterValue": "subnet-065e2a951d7ce5909"
+    },
+    {
+        "ParameterKey": "CustomDBSecurityGroup",
+        "ParameterValue": "sg-074f7e1d8c775d035"
+    },
+    {
+        "ParameterKey": "Application",
+        "ParameterValue": "test"
+    },
+    {
+        "ParameterKey": "ApplicationVersion",
+        "ParameterValue": "test"
+    },
+    {
+        "ParameterKey": "ProjectCostCenter",
+        "ParameterValue": "test"
+    },
+    {
+        "ParameterKey": "Confidentiality",
+        "ParameterValue": "public"
+    },
+    {
+        "ParameterKey": "Compliance",
+        "ParameterValue": ""
+    },
+    {
+        "ParameterKey": "CopyTagsToSnapshot",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "LicenseModel",
+        "ParameterValue": "general-public-license"
+    },
+    {
+        "ParameterKey": "PubliclyAccessible",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "EnablePerformanceInsights",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "PerformanceInsightsRetentionPeriod",
+        "ParameterValue":"7"
+    },
+    {
+        "ParameterKey": "DBDeletionProtection",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "DBDeleteAutomatedBackups",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "DBStorageType",
+        "ParameterValue": "gp2"
+    },
+    {
+        "ParameterKey": "DBStorageEncrypted",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "Iops",
+        "ParameterValue": "1398"
+    }
+]
