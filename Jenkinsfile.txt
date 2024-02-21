@@ -66,9 +66,9 @@ pipeline {
         //     }
         // }
     }
-    post {
-    always {
-      cleanWs notFailBuild: true /* clean up our workspace */
-    }
-  }
+//     post {
+//     always {
+//       cleanWs notFailBuild: true /* clean up our workspace */
+//     }
+//   }
 }
