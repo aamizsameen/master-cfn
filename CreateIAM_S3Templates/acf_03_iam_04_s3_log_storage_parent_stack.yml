@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Parent template to create IAM roles, policies and an S3 bucket
+
+# Refer the corresponding config file to see the parameterized values
+
+Metadata:
+
+  AWS::CloudFormation::Interface:
+
+    ParameterGroups:
+    - Label:
+        default: Provide the Environment Name and Project Name for the tags. 
+      Parameters:
+      - ProjectName 
+      - Environment 
+      - S3BucketToStoreTemplates
+
+    - Label:
+        default: Provide the IAM Role names
+      Parameters:
+      - ClusterRoleName
+      - WorkerNodeRoleName
+      - Ec2CloudwatchRoleName
+      - Ec2AppMgmtRoleName
+
+    - Label:
+        default: S3 bucket for log storage
+      Parameters:
+      - S3BucketForLogs
+      - MapId
+
+    ParameterLabels:
+      ProjectName:
+        default: Project Name 
+      Environment:
+        default: Environment Name 
+      S3BucketToStoreTemplates:
+        default: S3 Bucket To Store Templates
+      ClusterRoleName:
+        default: Cluster Role Name
+      WorkerNodeRoleName:
+        default: Worker Node Role Name
+      Ec2CloudwatchRoleName:
+        default: Ec2 Cloudwatch Role Name
+      Ec2AppMgmtRoleName:
+        default: Ec2 App Mgmt Role Name
+      S3BucketForLogs:
+        default: S3 Bucket For Logs
+      MapId:
+        default: Map Id
+
+Parameters:
+  ProjectName:
+    Description: Enter the Project name  
+    Type: String
+  Environment:
+    Description: Enter the Environment name 
+    Type: String
+    Default: dev
+  S3BucketToStoreTemplates:
+    Description: Enter the bucket name where you will store the child templates
+    Type: String
+  ClusterRoleName:
+    Description: The Name of EKS Cluster Service Role
+    Type: String 
+  WorkerNodeRoleName:
+    Description: The Name of EKS Worker Node Role
+    Type: String        
+  Ec2CloudwatchRoleName:
+    Description: The Name of EKS Worker Node Role
+    Type: String 
+  Ec2AppMgmtRoleName:
+    Description: The Name of App Mgmt Role
+    Type: String  
+  S3BucketForLogs:
+    Description: "Enter the S3 Bucket name."
+    Type: String
+  MapId:
+    Description: MapId
+    Type: String
+    Default: mig60RPANO80S 
+
+Resources:
+  IAMRoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join ['', ['https://', !Ref S3BucketToStoreTemplates, '.s3.amazonaws.com/', 'acf_03_iam.yml']]
+      Parameters:
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        ClusterRoleName: !Ref ClusterRoleName
+        WorkerNodeRoleName: !Ref WorkerNodeRoleName
+        Ec2CloudwatchRoleName: !Ref Ec2CloudwatchRoleName
+        Ec2AppMgmtRoleName: !Ref Ec2AppMgmtRoleName
+
+  S3LogStorageStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join ['', ['https://', !Ref S3BucketToStoreTemplates, '.s3.amazonaws.com/', 'acf_04_s3_log_storage.yml']]
+      Parameters:
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        S3BucketForLogs: !Ref S3BucketForLogs
+        MapId: !Ref MapId

@@ -1,0 +1,38 @@
+[
+    {
+      "ParameterKey": "ProjectName",
+      "ParameterValue": "axcessdev"
+    },
+    {
+      "ParameterKey": "Environment",
+      "ParameterValue": "dev"
+    },
+    {
+      "ParameterKey": "ClusterRoleName",
+      "ParameterValue": "eks-cluster"      
+    },
+    {
+      "ParameterKey": "WorkerNodeRoleName",
+      "ParameterValue": "eks-node"
+    },
+    {
+      "ParameterKey": "Ec2CloudwatchRoleName",
+      "ParameterValue": "ec2-cloudwatch"
+    },
+    {
+      "ParameterKey": "Ec2AppMgmtRoleName",
+      "ParameterValue": "ec2-app-mgmt"      
+    },  
+    {
+      "ParameterKey": "S3BucketForLogs",
+      "ParameterValue": "bnm-testing"      
+    }, 
+    {
+      "ParameterKey": "MapId",
+      "ParameterValue": "mig60RPANO80S"      
+    },
+    {
+      "ParameterKey": "S3BucketToStoreTemplates",
+      "ParameterValue": "bnm-testing"
+    }  
+]    

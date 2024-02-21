@@ -43,32 +43,12 @@ pipeline {
         //                 echo "Which Environment"
         //                 echo "${DEPLOY_ENV}"
         //                 echo "Executing in $DEPLOY_ENV environment"
-        //                 sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yaml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-        //                 sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database --region ${REGION}"
+        //                 sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database-Template --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yaml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+        //                 sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database-Template --region ${REGION}"
         //          //   }
         //         }
         //     }
         // }
-
-        stage ('Deploy Network Stack in dev account')
-        {
-            // when { 
-            //     expression { params.BRANCH == 'dev' }
-            // }
-            steps {
-                // For cross account use the below.
-                //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
-                    script {
-                        echo "Which Environment"
-                        echo "${DEPLOY_ENV}"
-                        echo "Executing in $DEPLOY_ENV environment"
-                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network    --template-body file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack.yml --parameters file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-                        sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network --region ${REGION}"
-                 //   }
-                }
-            }
-        }
-
 
         // stage ('Deploy Network Stack in dev account')
         // {
@@ -82,12 +62,32 @@ pipeline {
         //                 echo "Which Environment"
         //                 echo "${DEPLOY_ENV}"
         //                 echo "Executing in $DEPLOY_ENV environment"
-        //                 sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network    --template-body file://CreateNetworkTemplates/main.yaml --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-        //                 sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network --region ${REGION}"
+        //                 sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template    --template-body file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack.yml --parameters file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+        //                 sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template --region ${REGION}"
         //          //   }
         //         }
         //     }
         // }
+
+
+        stage ('Deploy IAM & S3 Stack in dev account')
+        {
+            // when { 
+            //     expression { params.BRANCH == 'dev' }
+            // }
+            steps {
+                // For cross account use the below.
+                //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
+                    script {
+                        echo "Which Environment"
+                        echo "${DEPLOY_ENV}"
+                        echo "Executing in $DEPLOY_ENV environment"
+                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM_S3-Template    --template-body file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack.yml --parameters file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+                        sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM_S3-Template --region ${REGION}"
+                 //   }
+                }
+            }
+        }
 
 
         // stage ('Execute deployment in prod account') {
