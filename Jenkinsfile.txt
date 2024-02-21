@@ -43,7 +43,7 @@ pipeline {
                         echo "Executing in $DEPLOY_ENV environment"
                         sh "pwd"
                         sh "ls -lart"
-                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV} --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM --region ${REGION}"
+                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV} --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yaml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM --region ${REGION}"
                         sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV} --region ${REGION}"
                  //   }
                 }
