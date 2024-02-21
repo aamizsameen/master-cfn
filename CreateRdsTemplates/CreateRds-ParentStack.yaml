@@ -410,7 +410,7 @@ Resources:
   RdsInstanceStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://vikas-template-testing.s3.amazonaws.com/CreateRds-ChildStack1.yaml
+      TemplateURL: https://bnm-testing.s3.amazonaws.com/child_template/CreateRds-ChildStack1.yaml
       Parameters:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
@@ -456,7 +456,7 @@ Resources:
     Condition: DBPasswordRotation
     DependsOn: RdsInstanceStack
     Properties:
-      TemplateURL: https://vikas-template-testing.s3.amazonaws.com/CreateRds-PasswordRotation-ChildStack2.yaml
+      TemplateURL: https://bnm-testing.s3.amazonaws.com/child_template/CreateRds-PasswordRotation-ChildStack2.yaml
       Parameters:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
