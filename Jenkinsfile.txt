@@ -82,8 +82,8 @@ pipeline {
                         echo "Which Environment"
                         echo "${DEPLOY_ENV}"
                         echo "Executing in $DEPLOY_ENV environment"
-                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM_S3-Template    --template-body file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack.yml --parameters file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-                        sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM_S3-Template --region ${REGION}"
+                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM-S3-Template    --template-body file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack.yml --parameters file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+                        sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM-S3-Template --region ${REGION}"
                  //   }
                 }
             }
