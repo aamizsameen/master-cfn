@@ -35,7 +35,7 @@ pipeline {
             //     expression { params.BRANCH == 'dev' }
             // }
             steps {
-                withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
+                //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
                     script {
                         echo "Which Environment"
                         echo "${DEPLOY_ENV}"
