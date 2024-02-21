@@ -35,6 +35,7 @@ pipeline {
             //     expression { params.BRANCH == 'dev' }
             // }
             steps {
+                // For cross account use the below.
                 //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
                     script {
                         echo "Which Environment"
@@ -42,7 +43,7 @@ pipeline {
                         echo "Executing in $DEPLOY_ENV environment"
                         sh "pwd"
                         sh "ls -lart"
-                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV} --template-body file:///var/lib/jenkins/workspace/'${JOB_BASE_NAME}'/CreateRdsTemplates/CreateRds-ParentStack.yml --parameters file:///var/lib/jenkins/workspace/'${JOB_BASE_NAME}'/CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM --region ${REGION}"
+                        sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV} --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM --region ${REGION}"
                         sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV} --region ${REGION}"
                  //   }
                 }
