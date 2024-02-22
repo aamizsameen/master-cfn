@@ -30,10 +30,11 @@ pipeline {
         //         sh 'git pull'
         //     }
         // }
+        
+        parameters([choice(name: 'PROCEED', choices: ['yes','no'], description: 'Do you want to proceed with the DB Stack creation?')])
 
         stage ('Deploy DB Stack in dev account')
         {
-            parameters([choice(name: 'PROCEED', choices: ['yes','no'], description: 'Do you want to proceed with the DB Stack creation?')])
             when { 
                 expression { params.PROCEED == 'yes' }
             }
