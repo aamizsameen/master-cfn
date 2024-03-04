@@ -91,10 +91,11 @@ pipeline {
                             echo "${DEPLOY_ENV}"
                             echo "Executing in $DEPLOY_ENV environment"
                             echo "Copying the child templates to S3 bucket..."
-                            sh "aws s3 cp --recursive file://iaas/aws/cloud_formation/02_network_and_security/ s3://bnm-testing/"
-                            echo "Copied the templates to S3."
-                            sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template    --template-body file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack.yml --parameters file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-                            sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template --region ${REGION}"
+                            pullGitRepo("${env.CICD_GIT_BRANCH}", "${env.CICD_CREDENTIALS_ID}", "${env.CICD_GIT_REPO}")
+                            // sh "aws s3 cp --recursive file://iaas/aws/cloud_formation/02_network_and_security/ s3://bnm-testing/"
+                            // echo "Copied the templates to S3."
+                            // sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template    --template-body file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack.yml --parameters file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+                            // sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template --region ${REGION}"
                         }
                  //   }
                 }
@@ -154,26 +155,21 @@ pipeline {
         //     }
         // }
     }
-//     post {
-//     always {
-//       cleanWs notFailBuild: true /* clean up our workspace */
-//     }
-//   }
 
+    post {
 
+        failure{
+            echo "Notifying in slack."
+            slackFailureNotification()
+            echo "Notified the failure status in slack."  
+        }
 
-  post {
-    failure{
-        echo "Notifying in slack."
-        slackFailureNotification()
-        echo "Notified the failure status in slack."   
+        success{
+            echo "Notifying in slack."
+            slackSuccessNotification()
+            echo "Notified the success status in slack."
+        }
+        
     }
-
-    success{
-        echo "Notifying in slack."
-        slackSuccessNotification()
-        echo "Notified the success status in slack." 
-    }
-  }
 
 }
