@@ -5,10 +5,11 @@ properties([
 	choice(name: 'REGION', choices: ['ap-south-1','us-east-2','us-west-1'], description: 'The Target Region'),
 	choice(name: 'ACTION', choices: ['create-stack','update-stack'], description: 'To create and update the cloudformation stack'),
 	choice(name: 'WAIT', choices: ['stack-create-complete','stack-update-complete'], description: 'To wait until the stack created or updated'),
-    string(defaultValue: 'scriptcrunch', name: 'JENKINS_BUILDSERVER_ROLEARN', trim: true, description: 'Jenkins build server role arn' ),
+    // string(defaultValue: 'scriptcrunch', name: 'JENKINS_BUILDSERVER_ROLEARN', trim: true, description: 'Jenkins build server role arn' ),
     string(defaultValue: 'BASEINFRA', name: 'INFRA_STACK_NAME', trim: true, description: 'Infra Stack Name'),
    ])
 ])
+
 pipeline {
     agent {
     	node {
@@ -33,18 +34,51 @@ pipeline {
         
         //parameters([choice(name: 'PROCEED', choices: ['yes','no'], description: 'Do you want to proceed with the DB Stack creation?')])
 
-        stage ('Deploy DB Stack in dev account')
+        // stage ('Deploy DB Stack in dev account')
+        // {
+        //     // when { 
+        //     //     expression { params.PROCEED == 'yes' }
+        //     // }
+        //     steps {
+        //         // For cross account use the below.
+        //         //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
+        //             script {
+        //                 try {
+        //                     PROCEED = input message: 'Database Stack',
+        //                         parameters: [[$class: 'ChoiceParameterDefinition', name: 'Do you want to proceed with the DB Stack creation?', choices: ['yes', 'no'], description: 'Select yes if you would like to proceed with the DB stack creation']]
+        //                 }
+        //                 catch (err) {
+        //                     echo "${err}"
+        //                     PROCEED = "yes"
+        //                 }
+
+        //                 if (PROCEED == "yes") {
+        //                     echo "Which Environment"
+        //                     echo "${DEPLOY_ENV}"
+        //                     echo "Executing in $DEPLOY_ENV environment"
+        //                     echo "Copying the child templates to S3 bucket..."
+        //                     sh "aws s3 cp --recursive file://iaas/aws/cloud_formation/01_iam_and_s3/ s3://bnm-testing/"
+        //                     echo "Copied the templates to S3."
+        //                     sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database-Template --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yaml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+        //                     sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database-Template --region ${REGION}"
+        //                 }
+        //          //   }
+        //         }
+        //     }
+        // }
+
+        stage ('Deploy Network Stack in dev account')
         {
             // when { 
-            //     expression { params.PROCEED == 'yes' }
+            //     expression { params.BRANCH == 'dev' }
             // }
             steps {
                 // For cross account use the below.
                 //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
                     script {
                         try {
-                            PROCEED = input message: 'Do you want to proceed with the DB Stack creation?',
-                                parameters: [[$class: 'ChoiceParameterDefinition', name: 'Do you want to proceed with the DB Stack creation?', choices: ['yes', 'no'], description: 'Select yes if you would like to proceed with the DB stack creation']]
+                            PROCEED = input message: 'Do you want to proceed with the Network Stack creation?',
+                                parameters: [[$class: 'ChoiceParameterDefinition', name: 'Do you want to proceed with the Network Stack creation?', choices: ['yes', 'no'], description: 'Select yes if you would like to proceed with the Network stack creation']]
                         }
                         catch (err) {
                             echo "${err}"
@@ -52,35 +86,20 @@ pipeline {
                         }
 
                         if (PROCEED == "yes") {
+
                             echo "Which Environment"
                             echo "${DEPLOY_ENV}"
                             echo "Executing in $DEPLOY_ENV environment"
-                            sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database-Template --template-body file://CreateRdsTemplates/CreateRds-ParentStack.yaml --parameters file://CreateRdsTemplates/CreateRdsParameters.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-                            sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Database-Template --region ${REGION}"
+                            echo "Copying the child templates to S3 bucket..."
+                            sh "aws s3 cp --recursive file://iaas/aws/cloud_formation/02_network_and_security/ s3://bnm-testing/"
+                            echo "Copied the templates to S3."
+                            sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template    --template-body file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack.yml --parameters file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+                            sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template --region ${REGION}"
                         }
                  //   }
                 }
             }
         }
-
-        // stage ('Deploy Network Stack in dev account')
-        // {
-        //     // when { 
-        //     //     expression { params.BRANCH == 'dev' }
-        //     // }
-        //     steps {
-        //         // For cross account use the below.
-        //         //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
-        //             script {
-        //                 echo "Which Environment"
-        //                 echo "${DEPLOY_ENV}"
-        //                 echo "Executing in $DEPLOY_ENV environment"
-        //                 sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template    --template-body file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack.yml --parameters file://CreateNetworkTemplates/acf_01_vpc_02_security_groups_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-        //                 sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-Network-Template --region ${REGION}"
-        //          //   }
-        //         }
-        //     }
-        // }
 
 
         // stage ('Deploy IAM & S3 Stack in dev account')
@@ -92,11 +111,26 @@ pipeline {
         //         // For cross account use the below.
         //         //withAWS(role:'arn:aws:iam::317185619046:role/ec2-s3-bnm', roleAccount:'317185619046'){
         //             script {
-        //                 echo "Which Environment"
-        //                 echo "${DEPLOY_ENV}"
-        //                 echo "Executing in $DEPLOY_ENV environment"
-        //                 sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM-S3-Template    --template-body file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack.yml --parameters file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
-        //                 sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM-S3-Template --region ${REGION}"
+        //                 try {
+        //                     PROCEED = input message: 'Do you want to proceed with the IAM & S3 Stack creation?',
+        //                         parameters: [[$class: 'ChoiceParameterDefinition', name: 'Do you want to proceed with the IAM & S3 Stack creation?', choices: ['yes', 'no'], description: 'Select yes if you would like to proceed with the IAM & S3 stack creation']]
+        //                 }
+        //                 catch (err) {
+        //                     echo "${err}"
+        //                     PROCEED = "yes"
+        //                 }
+
+        //                 if (PROCEED == "yes") {
+
+        //                     echo "Which Environment"
+        //                     echo "${DEPLOY_ENV}"
+        //                     echo "Executing in $DEPLOY_ENV environment"
+        //                     echo "Copying the child templates to S3 bucket..."
+        //                     sh "aws s3 cp --recursive file://iaas/aws/cloud_formation/03_rds/ s3://bnm-testing/"
+        //                     echo "Copied the templates to S3."
+        //                     sh "aws cloudformation $ACTION --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM-S3-Template    --template-body file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack.yml --parameters file://CreateIAM_S3Templates/acf_03_iam_04_s3_log_storage_parent_stack_params.json --capabilities CAPABILITY_NAMED_IAM CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --region ${REGION}"
+        //                     sh "aws cloudformation wait ${WAIT} --stack-name ${INFRA_STACK_NAME}-${DEPLOY_ENV}-IAM-S3-Template --region ${REGION}"
+        //                 }
         //          //   }
         //         }
         //     }
@@ -125,4 +159,21 @@ pipeline {
 //       cleanWs notFailBuild: true /* clean up our workspace */
 //     }
 //   }
+
+
+
+  post {
+    failure{
+        echo "Notifying in slack."
+        slackFailureNotification()
+        echo "Notified the failure status in slack."   
+    }
+
+    success{
+        echo "Notifying in slack."
+        slackSuccessNotification()
+        echo "Notified the success status in slack." 
+    }
+  }
+
 }
